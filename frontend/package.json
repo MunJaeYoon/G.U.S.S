@@ -1,0 +1,40 @@
+{
+  "name": "guss-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "axios": "^1.13.2",
+    "chart.js": "^4.5.1",
+    "firebase": "^12.8.0",
+    "framer-motion": "^12.24.12",
+    "lucide-react": "^0.460.0",
+    "qrcode.react": "^4.2.0",
+    "react": "19.2.3",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.3",
+    "react-router-dom": "^7.12.0",
+    "tailwindcss": "4.1.18"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.19.1",
+    "vite": "^6.0.3"
+  }
+}

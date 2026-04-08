@@ -1,0 +1,117 @@
+openapi: 3.0.0
+info:
+  title: G.U.S.S (Gym User Support Service) API
+  description: 실시간 혼잡도 확인, Bcrypt 보안 가입 및 JWT 기반 예약 시스템
+  version: 1.2.0
+
+servers:
+  - url: http://localhost:9000
+    description: 로컬 개발 서버
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      required: [user_name, user_phone, user_id, user_pw]
+      properties:
+        user_name: { type: string, example: "김고퍼" }
+        user_phone: { type: string, example: "010-1234-5678" }
+        user_id: { type: string, example: "testuser04" }
+        user_pw: { type: string, example: "password123", description: "서버에서 Bcrypt로 해싱됨" }
+
+    Gym:
+      type: object
+      properties:
+        guss_number: { type: integer, example: 1 }
+        guss_name: { type: string, example: "명지대 MCC 체육시설" }
+        guss_user_count: { type: integer, example: 12 }
+        guss_size: { type: integer, example: 50 }
+
+    SuccessResponse:
+      type: object
+      properties:
+        status: { type: string, example: "success" }
+
+paths:
+  /register:
+    post:
+      summary: 회원가입 (비밀번호 해싱 적용)
+      tags: [Auth]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/User' }
+      responses:
+        '200': { description: "가입 성공" }
+        '500': { description: "아이디 중복 또는 DB 오류" }
+
+  /login:
+    post:
+      summary: 로그인 (JWT 토큰 발급)
+      tags: [Auth]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id: { type: string }
+                user_pw: { type: string }
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "success" }
+                  token: { type: string, example: "eyJhbGci..." }
+                  user_name: { type: string, example: "김고퍼" }
+                  user_role: { type: string, example: "USER" }
+        '401': { description: "아이디 또는 비밀번호 불일치" }
+
+  /reserve:
+    post:
+      summary: 체육관 예약 (중복 예약 및 노쇼 방지 적용)
+      tags: [Reservation]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gym_id: { type: integer, example: 1 }
+      responses:
+        '200': { description: "예약 성공" }
+        '400': { description: "이미 예약이 존재함 (노쇼 방지)" }
+        '401': { description: "인증 토큰 없음" }
+
+  /admin/dashboard:
+    get:
+      summary: 관리자 대시보드 통계
+      tags: [Admin]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: "통계 데이터 반환" }
+        '403': { description: "관리자 권한 없음" }
+
+  /admin/reservations:
+    get:
+      summary: 체육관별 예약 현황 조회
+      tags: [Admin]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: gym_id
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: "예약 리스트 반환" }
